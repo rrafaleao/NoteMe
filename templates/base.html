@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Note Me</title>
+    <link rel="icon" href="https://images.ctfassets.net/9haz2glq4wt0/4rfveQ83nxKftcQQ11nQM3/ab921ac288d52e484a6f6d19bec6c20f/GoodNotes_6_Logo_-_AI_Note-Taking_App_iPad.png"/>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet">
+    <script>
+        // Script para alternar entre temas
+        function toggleDarkMode() {
+            const body = document.body;
+            const isDark = body.classList.toggle('dark-mode');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            // Enviar solicitação para o servidor para registrar a mudança de tema
+            fetch("{{ url_for('toggle_theme') }}", { method: 'POST' });
+        }
+
+        // Carregar tema do localStorage
+        window.onload = function () {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+            }
+            
+            // Adicionar evento de clique para o botão de tema
+            document.getElementById('toggle-theme-btn').addEventListener('click', toggleDarkMode);
+        };
+    </script>
+</head>
+<body>
+    <div class="d-flex">
+        <!-- Barra lateral -->
+        <div class="d-flex flex-column p-3 bg-light" style="width: 280px; height: 100vh;">
+            <a href="{{ url_for('index') }}" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
+                <span class="fs-4">Página Inicial 📆</span>
+            </a>
+            <hr>
+            <ul class="nav nav-pills flex-column mb-auto">
+                <li class="nav-item">
+                    <strong class="mb-2 d-flex align-items-center justify-content-between">
+                        Tarefas
+                        <a href="{{ url_for('add_task') }}" class="btn btn-sm btn-outline-primary">+</a>
+                    </strong>
+                </li>
+                {% if tasks %}
+                {% for task in tasks %}
+                <li>
+                    <a href="{{ url_for('task_detail', task_id=task.id) }}" class="nav-link text-dark">{{ task.emoji }} {{ task.title }}</a>
+                </li>
+                {% endfor %}
+                {% else %}
+                <li>
+                    <span class="text-muted">Nenhuma tarefa adicionada ainda.</span>
+                </li>
+                {% endif %}
+            </ul>
+            <hr>
+            <div class="mt-auto">
+                <button class="btn btn-outline-secondary w-100 mb-2" id="toggle-theme-btn">🌓Alternar Tema</button>
+            </div>
+        </div>
+        
+        <!-- Conteúdo Principal -->
+        <div class="content flex-grow-1 p-4">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+</body>
+</html>

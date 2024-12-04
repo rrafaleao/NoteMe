@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="form-container">
+        <h1 class="mb-4">Adicionar Nova Tarefa</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div>
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('add_task') }}" method="POST">
+            <div class="mb-3">
+                <label for="title" class="form-label">Título</label>
+                <input type="text" class="form-control" id="title" name="title" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="description" class="form-label">Descrição</label>
+                <textarea class="form-control" id="description" name="description" rows="4"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label for="emoji" class="form-label">Emoji</label>
+                <div class="d-flex align-items-center">
+                    <input type="text" class="form-control me-2" id="emoji" name="emoji" value="📘">
+                    <button type="button" class="btn btn-secondary" onclick="showEmojiPicker()">🙂</button>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Adicionar Tarefa</button>
+        </form>
+
+        <script>
+            function showEmojiPicker() {
+                // Verifica se já existe um emoji picker
+                const existingPicker = document.querySelector('.emoji-picker');
+                
+                // Se já existir, remove o picker
+                if (existingPicker) {
+                    existingPicker.remove();
+                    return;
+                }
+        
+                const emojiList = ["📘", "✏️", "📖", "✅", "❌", "📅", "🚀", "💻"];
+                const emojiPicker = document.createElement("div");
+                emojiPicker.classList.add("emoji-picker", "mt-2", "p-2", "border", "rounded");
+                
+                emojiList.forEach((emoji) => {
+                    const button = document.createElement("button");
+                    button.type = "button";
+                    button.classList.add("btn", "btn-light", "me-2", "mb-2");
+                    button.innerText = emoji;
+                    button.onclick = () => {
+                        document.getElementById("emoji").value = emoji;
+                        emojiPicker.remove();
+                    };
+                    emojiPicker.appendChild(button);
+                });
+                
+                // Adiciona um botão de fechar
+                const closeButton = document.createElement("button");
+                closeButton.type = "button";
+                closeButton.classList.add("btn", "btn-secondary", "w-100", "mt-2");
+                closeButton.innerText = "Fechar";
+                closeButton.onclick = () => {
+                    emojiPicker.remove();
+                };
+                emojiPicker.appendChild(closeButton);
+                
+                document.querySelector("form").appendChild(emojiPicker);
+            }
+        </script>
+    </div>
+</div>
+{% endblock %}
